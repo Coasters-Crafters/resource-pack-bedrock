@@ -31,7 +31,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: /home/runner/work/resource-pack-bedrock/resource-pack-bedrock/staging/default_assets.zip
-        key: ${{ runner.os }}-${{ steps.minecraft_version.outputs.MINECRAFT_VERSION }}
+        key: ${{ runner.os }}-v2-${{ steps.minecraft_version.outputs.MINECRAFT_VERSION }}
     - name: Enable node module cache
       id: cache-npm
       uses: actions/cache@v3
@@ -52,8 +52,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y moreutils zip
-        npm root -g
-        (command spritesheet-js 2>/dev/null) && echo "spritesheet-js already installed" || yarn global add spritesheet-js
+        yarn global add spritesheet-js
     - name: Build pack
       continue-on-error: true
       env:
@@ -66,12 +65,5 @@ jobs:
         wget https://raw.githubusercontent.com/Kas-tle/java2bedrock.sh/main/converter.sh
         chmod +x converter.sh
         ./converter.sh ${JAVA_PACK_FILE} -w "false" -m "coaster_con_base.mcpack" -a "entity_alphatest_one_sided" -b "alpha_test" -f "null" -v "${MINECRAFT_VERSION}"
-        readlink -f default_assets.zip
-    - name: Archive debug artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: Debugging Artifacts
-        path: |
-          staging/
-          !staging/default_assets.zip
+
 
