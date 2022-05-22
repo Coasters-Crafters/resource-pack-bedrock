@@ -26,11 +26,19 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Enable Cache
+    - name: Enable default asset cache
       id: cache-action
       uses: actions/cache@v2
       with:
         path: staging/default_assets.zip
+        key: ${{ runner.os }}-${{ steps.minecraft_version.outputs.MINECRAFT_VERSION }}
+    - name: Enable node module cache
+      id: cache-npm
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.npm
         key: ${{ runner.os }}-cache-key
     - name: Compress and stage base pack
       run: | 
@@ -43,7 +51,7 @@ jobs:
         node-version: 16
     - name: Install dependencies
       run: |
-        sudo apt-get install -y moreutils zip
+        sudo apt-get install -y moreutils zip imagemagick
         npm i -g spritesheet-js
     - name: Build pack
       continue-on-error: true
