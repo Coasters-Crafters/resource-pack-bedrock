@@ -48,12 +48,13 @@ jobs:
     - name: Install NodeJS
       uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 17
+        cache: 'yarn'
     - name: Install dependencies
       run: |
         sudo apt-get install -y moreutils zip
         npm root -g
-        (command spritesheet-js 2>/dev/null) && echo "spritesheet-js already installed" || npm i -g spritesheet-js
+        (command spritesheet-js 2>/dev/null) && echo "spritesheet-js already installed" || yarn global add spritesheet-js
     - name: Build pack
       continue-on-error: true
       env:
