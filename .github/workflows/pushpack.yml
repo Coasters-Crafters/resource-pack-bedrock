@@ -12,10 +12,12 @@ jobs:
     timeout-minutes: 15
     steps:
     - name: Get latest pack URL
-      id: java_pack_url
+      id: java_pack_info
       run: |
         JAVA_PACK_URL=$(curl -sL https://api.github.com/repos/Coasters-Crafters/resource-pack/releases | jq -r '.[0].assets[-1].browser_download_url')
         echo "::set-output name=JAVA_PACK_URL::${JAVA_PACK_URL}"
+        JAVA_PACK_FILE=$(jq -r -n --arg java_pack_url ${JAVA_PACK_URL} '$java_pack_url | split("/") | .[-1]')
+        echo "::set-output name=JAVA_PACK_FILE::${JAVA_PACK_FILE}"
     - name: Set minecraft version
       id: minecraft_version
       run: |
@@ -45,14 +47,15 @@ jobs:
     - name: Build pack
       continue-on-error: true
       env:
-        JAVA_PACK_URL: ${{ steps.java_pack_url.outputs.JAVA_PACK_URL }}
+        JAVA_PACK_URL: ${{ steps.java_pack_info.outputs.JAVA_PACK_URL }}
+        JAVA_PACK_FILE: ${{ steps.java_pack_info.outputs.JAVA_PACK_FILE }}
         MINECRAFT_VERSION: ${{ steps.minecraft_version.outputs.MINECRAFT_VERSION }}
       run: |
         cd staging
         wget ${JAVA_PACK_URL}
         wget https://raw.githubusercontent.com/Kas-tle/java2bedrock.sh/main/converter.sh
         chmod +x converter.sh
-        ./converter.sh CoasterConResoucePack-1.1.24.zip -w "false" -m "coaster_con_base.mcpack" -a "entity_alphatest_one_sided" -b "alpha_test" -f "null" -v "${MINECRAFT_VERSION}"
+        ./converter.sh ${JAVA_PACK_FILE} -w "false" -m "coaster_con_base.mcpack" -a "entity_alphatest_one_sided" -b "alpha_test" -f "null" -v "${MINECRAFT_VERSION}"
     - name: Archive debug artifacts
       uses: actions/upload-artifact@v3
       with:
