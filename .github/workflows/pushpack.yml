@@ -1,0 +1,63 @@
+name: Push Pack
+
+on:
+    push:
+        paths:
+            - "manifest.json"
+
+jobs:
+  build:
+    name: Compress, Build, and Send Pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - name: Get latest pack URL
+      id: java_pack_url
+      run: |
+        JAVA_PACK_URL=$(curl -sL https://api.github.com/repos/Coasters-Crafters/resource-pack/releases | jq -r '.[0].assets[-1].browser_download_url')
+        echo "::set-output name=JAVA_PACK_URL::${JAVA_PACK_URL}"
+    - name: Set minecraft version
+      id: minecraft_version
+      run: |
+        MINECRAFT_VERSION=1.18.2
+        echo "::set-output name=MINECRAFT_VERSION::${MINECRAFT_VERSION}"
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Enable Cache
+      id: cache-action
+      uses: actions/cache@v2
+      with:
+        path: staging/default_assets.zip
+        key: ${{ runner.os }}-cache-key
+    - name: Compress and stage base pack
+      run: | 
+        zip -8 -r -X  coaster_con_base.mcpack *
+        mkdir -p staging
+        cp coaster_con_base.mcpack staging/
+    - name: Install NodeJS
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y moreutils zip
+    - name: Build pack
+      continue-on-error: true
+      env:
+        JAVA_PACK_URL: ${{ steps.java_pack_url.outputs.JAVA_PACK_URL }}
+        MINECRAFT_VERSION: ${{ steps.minecraft_version.outputs.MINECRAFT_VERSION }}
+      run: |
+        cd staging
+        wget ${JAVA_PACK_URL}
+        wget https://raw.githubusercontent.com/Kas-tle/java2bedrock.sh/main/converter.sh
+        chmod +x converter.sh
+        ./converter.sh CoasterConResoucePack-1.1.24.zip -w "false" -m "coaster_con_base.mcpack" -a "entity_alphatest_one_sided" -b "alpha_test" -f "null" -v "${MINECRAFT_VERSION}"
+    - name: Archive debug artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Debugging Artifacts
+        path: |
+          staging/
+          !staging/default_assets.zip
+
