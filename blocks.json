@@ -1,0 +1,18 @@
+{
+    "format_version": [1, 1, 0],
+    "frame": {
+        "blockshape": "invisible",
+        "sound": "itemframe",
+        "textures": "itemframe_background"
+    },
+    "glow_frame": {
+        "blockshape": "invisible",
+        "sound": "itemframe",
+        "textures": "glow_item_frame"
+    },
+    "deepslate_tile_stairs" : {
+       "isotropic" : false,
+       "sound" : "deepslate_bricks",
+       "textures" : "stone_slab"
+    }
+}
