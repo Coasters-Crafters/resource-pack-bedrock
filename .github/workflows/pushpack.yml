@@ -27,10 +27,10 @@ jobs:
       with:
         fetch-depth: 0
     - name: Enable default asset cache
-      id: cache-action
+      id: cache-default-assets
       uses: actions/cache@v3
       with:
-        path: staging/default_assets.zip
+        path: /home/runner/work/resource-pack-bedrock/resource-pack-bedrock/staging/default_assets.zip
         key: ${{ runner.os }}-${{ steps.minecraft_version.outputs.MINECRAFT_VERSION }}
     - name: Enable node module cache
       id: cache-npm
