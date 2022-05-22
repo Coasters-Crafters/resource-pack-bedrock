@@ -28,7 +28,7 @@ jobs:
         fetch-depth: 0
     - name: Enable default asset cache
       id: cache-action
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: staging/default_assets.zip
         key: ${{ runner.os }}-${{ steps.minecraft_version.outputs.MINECRAFT_VERSION }}
@@ -38,7 +38,7 @@ jobs:
       env:
         cache-name: cache-node-modules
       with:
-        path: /usr/local/lib/node_modules
+        path: /opt/hostedtoolcache/node/**/x64/lib/node_modules
         key: ${{ runner.os }}-cache-key
     - name: Compress and stage base pack
       run: | 
@@ -66,6 +66,7 @@ jobs:
         wget https://raw.githubusercontent.com/Kas-tle/java2bedrock.sh/main/converter.sh
         chmod +x converter.sh
         ./converter.sh ${JAVA_PACK_FILE} -w "false" -m "coaster_con_base.mcpack" -a "entity_alphatest_one_sided" -b "alpha_test" -f "null" -v "${MINECRAFT_VERSION}"
+        readlink -f default_assets.zip
     - name: Archive debug artifacts
       uses: actions/upload-artifact@v3
       with:
