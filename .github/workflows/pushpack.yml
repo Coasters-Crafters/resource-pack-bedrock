@@ -42,7 +42,7 @@ jobs:
         key: ${{ runner.os }}-cache-key
     - name: Compress and stage base pack
       run: | 
-        zip -8 -r -X  coaster_con_base.mcpack *
+        zip -8 -r -X coaster_con_base.mcpack * -x "./staging/*"
         mkdir -p staging
         cp coaster_con_base.mcpack staging/
     - name: Install NodeJS
